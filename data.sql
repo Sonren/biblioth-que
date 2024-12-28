@@ -9,6 +9,3 @@ CREATE TABLE books (
     date DATE
 );
 
--- Insertion de données dans la table books
-INSERT INTO books (isbn, name, date) VALUES
-('978-2-266-15500-7', 'La Brèche', '2005-03-01');
