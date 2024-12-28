@@ -1,18 +1,13 @@
-# Getting Started with Create React App
+### To run the application
+ 
+To lauch a database psql the command line is psql -U sonren -d library 
+to run the appliation you have to run node test_recup_bd.js because this give acces to the database 
+the command line to open the application is 'cd library\npm start'. The application run on the port [localhost 3000](http://localhost:3000/).
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
 
-In the project directory, you can run:
 
-### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
 
 ### `npm test`
 

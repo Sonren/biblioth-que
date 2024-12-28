@@ -5,6 +5,7 @@ DROP TABLE IF EXISTS books;
 CREATE TABLE books (
     isbn VARCHAR(17) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+    author VARCHAR(255),
     date DATE
 );
 
