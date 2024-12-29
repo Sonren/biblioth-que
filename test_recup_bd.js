@@ -22,6 +22,7 @@ const client = new Client({
         console.log('Connected to the database');
 
         app.get('/api/books', async (req,res) => {
+            const {isbnDelete, nameDelete} = req.body;
             try{
                 const result = await client.query('SELECT isbn, name, date FROM books');
                 res.json(result.rows);
@@ -40,6 +41,38 @@ const client = new Client({
                     res.status(201).json(result.rows[0]); // Réponse avec les données du livre inséré
                 } catch (err) {
                     res.status(500).json({ error: 'Erreur lors de l\'ajout du livre' });
+                }
+            }
+        });
+
+        app.delete('/api/books', async (req,res) =>{
+            const {isbnDelete, nameDelete} = req.body;
+            if(!isbnDelete && !nameDelete){
+                return res.status(400).json({ error: "ISBN ou nom requis pour supprimer un livre"});
+            }else if(isbnDelete && !nameDelete || isbnDelete && nameDelete){
+                try{
+                    const result = await client.query('DELETE FROM books WHERE isbn = $1 RETURNING *', [isbnDelete]);
+                    res.status(200).json(result.rows[0]);
+
+                    if (result.rowCount === 0) {
+                        return res.status(404).json({ error: 'Livre non trouvé' });
+                    }
+                    
+                } catch(err) {
+                    res.status(500).json({ error: 'Erreur lors de la suppression du livre'});
+                }
+            }else if (!isbnDelete && nameDelete){
+                try{
+                    const result = await client.query('SELECT * FROM books WHERE name = $1', [nameDelete]);
+                    if (result.rowCount === 0) {
+                        return res.status(404).json({ error: 'Livre non trouvé' });
+                    }else if(result.rowCount === 1){
+                        res.status(200).json(result.rows[0]);
+                    }else{
+                        res.json(result.rows);
+                    }
+                }catch(err){
+                    res.status(500).json({ error: 'Erreur lors de la suppression du livre'});
                 }
             }
         });

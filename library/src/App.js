@@ -2,6 +2,7 @@ import './App.css';
 import Popup from './components/Popup';
 import PrintBook from './components/printBook';
 import AddBook from './components/addBook';
+import DeleteBook from './components/DeleteBook';
 import { useState , useEffect} from 'react';
 
 
@@ -12,7 +13,9 @@ function App() {
   const [name, setName] = useState('');
   const [date, setDate] = useState('');
   const [message, setMessage] = useState('');
-
+  const [isbnDelete, setIsbnDelete] = useState('');
+  const [nameDelete, setNameDelete] = useState('');
+  const [messageDelete, setMessageDelete] = useState('');
 
   useEffect(() => {
     fetch('http://localhost:5001/api/books')
@@ -30,7 +33,76 @@ function App() {
         console.error('erreur : ', error);
       });
   }, []);
+ 
+  const noreload = async (event) => {
+      event.preventDefault();
 
+      if(!isbnDelete && !nameDelete){
+        console.log('il faut un isbn et un nom pour pouvoir supprimer un livre');
+      }else if(isbnDelete && !nameDelete || isbnDelete && nameDelete){
+        const response = await fetch('http://localhost:5001/api/books', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({isbnDelete, nameDelete}), // Envoi des données sous forme de JSON
+        });
+
+        if (response.ok){
+          const result = await response.json();
+          setMessageDelete('livre supprimé');
+          window.location.reload(); // recharge la page actuelle
+        } else {
+          const result = await response.json();
+          const errorMessage = result.error || 'Erreur lors de la suppression du livre'; // Utilise l'erreur du backend ou un message par défaut
+          setMessageDelete(errorMessage);
+        }
+      }else if(!isbnDelete && nameDelete){
+        const response = await fetch('http://localhost:5001/api/books', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({isbnDelete, nameDelete}), // Envoi des données sous forme de JSON
+        });
+
+        if (response.ok){
+          const result = await response.json();
+          if(result.rowCount == 1){
+            const responseDelete = await fetch('http://localhost:5001/api/books', {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({isbnDelete}), // Envoi des données sous forme de JSON
+            });
+
+            if (responseDelete.ok){
+              const result = await response.json();
+              setMessageDelete('livre supprimé');
+              window.location.reload(); // recharge la page actuelle
+            } else {
+              const result = await response.json();
+              const errorMessage = result.error || 'Erreur lors de la suppression du livre'; // Utilise l'erreur du backend ou un message par défaut
+              setMessageDelete(errorMessage);
+            }
+          }
+          setMessageDelete('livre supprimé');
+          window.location.reload(); // recharge la page actuelle
+        } else {
+          const result = await response.json();
+          const errorMessage = result.error || 'Erreur lors de la suppression du livre'; // Utilise l'erreur du backend ou un message par défaut
+          setMessageDelete(errorMessage);
+        }
+      }
+    // Réinitialisation des champs du formulaire
+    setNameDelete('');
+    setIsbnDelete('');
+  }
+
+  
+
+ //code pour ajouté un livre
   const handleSubmit = async (event) => {
     event.preventDefault(); // Empêche le rechargement de la page
 
@@ -61,18 +133,40 @@ function App() {
     setDate('');
   }
 
+
   return (
     <div className="App">
       <main>
       <h1 className='hello'> Bienvenue dans la librairie ! </h1>
         <button onClick={() => setButtonPopup(true)}>Oppen button</button>
         <h2 className='liste livre'> Liste des livres </h2>
+        <PrintBook 
+          books ={books} > 
+        </PrintBook>
+
+        <AddBook 
+          rechargement={handleSubmit} 
+          date = {date} 
+          name = {name} 
+          isbn={isbn} 
+          setName={setName} 
+          setIsbn={setIsbn} 
+          setDate={setDate} 
+          message={message}>
+        </AddBook>
+
+        <DeleteBook 
+          rechargement={noreload} 
+          isbnDelete={isbnDelete} 
+          nameDelete={nameDelete} 
+          setIsbnDelete={setIsbnDelete} 
+          setNameDelete={setNameDelete}
+          messageDelete={messageDelete}>
+        </DeleteBook>
+
       </main>
 
-        <PrintBook books ={books} > </PrintBook>
-
-        <AddBook rechargement={handleSubmit} date = {date} name = {name} isbn={isbn} setName={setName} setIsbn={setIsbn} setDate={setDate} message={message}></AddBook>
-
+       
 
         <Popup trigger={buttonPopup} setTrigger={setButtonPopup}> 
           <h3> My popup </h3>
