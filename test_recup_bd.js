@@ -21,8 +21,8 @@ const client = new Client({
         await client.connect();
         console.log('Connected to the database');
 
+        //pour opouvoir afficher le tableau des livres disponibles
         app.get('/api/books', async (req,res) => {
-            const {isbnDelete, nameDelete} = req.body;
             try{
                 const result = await client.query('SELECT isbn, name, date FROM books');
                 res.json(result.rows);
@@ -31,6 +31,24 @@ const client = new Client({
             }
         });
 
+        //pour pouvoir recuperer la liste des livres a supprimer 
+        app.get('/api/books/selectForDelete', async (req,res) => {
+            const {nameDelete} = req.body;
+            try{
+                const result = await client.query('SELECT * FROM books WHERE name = $1', [nameDelete]);
+                if (result.rowCount === 0) {
+                    return res.status(404).json({ error: 'Livre non trouvé' });
+                }else if(result.rowCount === 1){
+                    res.status(200).json(result.rows[0]);
+                }else{
+                    res.json(result.rows);
+                }
+            }catch(err){
+                res.status(500).json({ error: 'Erreur lors de la suppression du livre'});
+            }
+        });
+
+        //pour pouvoir ajouter un livre avec toute ses caractéristiques
         app.post('/api/books', async (req,res) => {
             const { name, date, isbn } = req.body; // On récupère les données envoyées par le frontend
             if(!name || ! isbn){
@@ -45,6 +63,7 @@ const client = new Client({
             }
         });
 
+        //fonction pour pouvoir delete un livre par son isbn
         app.delete('/api/books', async (req,res) =>{
             const {isbnDelete, nameDelete} = req.body;
             if(!isbnDelete && !nameDelete){
@@ -59,19 +78,6 @@ const client = new Client({
                     }
                     
                 } catch(err) {
-                    res.status(500).json({ error: 'Erreur lors de la suppression du livre'});
-                }
-            }else if (!isbnDelete && nameDelete){
-                try{
-                    const result = await client.query('SELECT * FROM books WHERE name = $1', [nameDelete]);
-                    if (result.rowCount === 0) {
-                        return res.status(404).json({ error: 'Livre non trouvé' });
-                    }else if(result.rowCount === 1){
-                        res.status(200).json(result.rows[0]);
-                    }else{
-                        res.json(result.rows);
-                    }
-                }catch(err){
                     res.status(500).json({ error: 'Erreur lors de la suppression du livre'});
                 }
             }
