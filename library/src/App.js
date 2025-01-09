@@ -59,14 +59,15 @@ function App() {
 
     try{
       //voir pour rajouter des tokens de connexion 
-      const response = await fetch('http://localhost:5001/api/book/isbn', {
+      const encodeISBN = encodeURIComponent(isbn);
+      const response = await fetch(`http://localhost:5001/api/book/${encodeISBN}`, {
         method: 'DELETE',
       });
 
       if (response.ok) {
-        setMessageDelete(`Livre "${name}" supprimé avec succès.`);
+        setMessageDelete(`Livre supprimé avec succès.`);
         // Rafraîchir les livres après suppression
-        refreshBooks();
+        refreshBooks(); // TODO faire un affichage qui s'affiche que quelques secondes faire threads dans une fonction
       } else {
         setMessageDelete('Erreur lors de la suppression du livre.');
       }
@@ -81,7 +82,9 @@ function App() {
       <main>
       <h1 className='hello'> Bienvenue dans la librairie ! </h1>
         <h2 className='liste livre'> Liste des livres </h2>
-        <PrintBook onRefresh={refreshBooks} key={refreshKey}> 
+        <PrintBook 
+          onRefresh={refreshBooks} 
+          key={refreshKey}> 
         </PrintBook>
 
         <AddBook 

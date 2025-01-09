@@ -7,7 +7,7 @@ const port = 5001;
 app.use(cors());
 app.use(express.json());
 
-const client = new Client({
+const client = new Client({//to connect in the database
     user: 'sonren',
     host: 'localhost',
     database: 'library',
@@ -21,7 +21,23 @@ const client = new Client({
 
         //function to check the correct format of the isbn  
         const isValidIsbn = (isbn) => {
-            return /^\d{10,13}$/.test(isbn);
+            // Retirer les tirets ou espaces
+            isbn = isbn.replace(/[\s-]/g, '');  
+            
+            if (isbn.length === 13) { //pour un isbn de 13 TODO isbn a 10
+                let sum = 0;
+                for (let i = 0; i < 13; i++) {
+                    const digit = parseInt(isbn[i], 10); // change the char to int in decimal (base 10)
+                    if (isNaN(digit)){// Vérifier que tous sont des chiffres
+                        console.log('ce ne sont pas des nombres');
+                        return false ; 
+                    } 
+                    sum += digit * (i % 2 === 0 ? 1 : 3); //the int are multiply by 1 or 3 depends of the parity of the emplacement in ISBN
+                }
+                return sum % 10 === 0;
+            }
+        
+            return false; // Longueur invalide
         }
 
         await client.connect();
@@ -32,7 +48,7 @@ const client = new Client({
         app.get('/api/books', async (req,res) => {
             try{
                 const result = await client.query('SELECT isbn, name, date FROM books');
-                res.json(result.rows);
+                res.json(result.rows);//we send all the rows selest in the database
             } catch (err) {
                 res.status(500).json({ error: 'erreur lors de la recuperation de données'});
             }
@@ -43,8 +59,11 @@ const client = new Client({
         //pour pouvoir ajouter un livre avec toute ses caractéristiques TODO gerer l'insertion sans date
         app.post('/api/books', async (req,res) => {
             const { name, date, isbn } = req.body; // On récupère les données envoyées par le frontend
-            if(!name || ! isbn){
+            if(!name || ! isbn){//we check that the request has a ISBN and a name
                 res.status(400).json({ error: 'Veuillez fournir un nom et un isbn'});
+            }
+            if(!isValidIsbn(isbn)){// we check the validity of the ISBN
+                return res.status(400).json({ error: "ISBN invalide"});
             }else {
                 try{
                     const result = await client.query('INSERT INTO books (isbn, name, date) VALUES ($1, $2, $3) RETURNING *',[isbn, name, date]);
@@ -60,13 +79,13 @@ const client = new Client({
         //fonction pour pouvoir delete un livre par son isbn
         app.delete('/api/book/:isbn', async (req, res) => {
             const isbn = decodeURIComponent(req.params.isbn); // Récupère l'ISBN de l'URL
-            console.log('Paramètres reçus :', req.params);
+            console.log('Paramètres reçus :', isbn);
 
-            if(!isbn){
+            if(!isbn){ //we check that the request has a ISBN
                 return res.status(400).json({ error: "ISBN requis pour supprimer un livre"});
             }
 
-            if(!isValidIsbn(isbn)){
+            if(!isValidIsbn(isbn)){// we check the validity of the ISBN
                 return res.status(400).json({ error: "ISBN invalide"});
             }
 

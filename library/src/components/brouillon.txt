@@ -34,3 +34,16 @@ brouillon bouton popup
           const [buttonPopup, setButtonPopup] = useState(false);
 
         <button onClick={() => setButtonPopup(true)}>Oppen button</button>
+
+
+liste isbn valide : 
+978-0-306-40615-7
+978-1-56619-909-4
+978-3-16-148410-0
+978-0-471-48648-0
+978-0-13-110362-7
+978-1-4028-9462-6
+978-0-596-52068-7
+978-1-86197-876-9
+978-0-312-34913-9
+978-0-307-26222-7
