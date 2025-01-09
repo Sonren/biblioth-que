@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const AddBook = ({ onSubmit, message }) => {
+const AddBook = ({ onSubmit, message, setMessage }) => {
   // États internes pour les valeurs du formulaire
   const [name, setName] = useState('');
   const [isbn, setIsbn] = useState('');
@@ -8,6 +8,10 @@ const AddBook = ({ onSubmit, message }) => {
   
   const handleSubmit = (event) => {
     event.preventDefault(); // Empêche le rechargement de la page
+    if (!name || !isbn) {
+      setMessage('Tous les champs sont obligatoires');
+      return;
+    }
     onSubmit({ name, isbn, date }); // Passe les données au parent
     setName('');
     setIsbn('');

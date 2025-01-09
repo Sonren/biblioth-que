@@ -1,0 +1,36 @@
+brouillon pour effacer un livre par son nom 
+//une pour selectionner les livres correspondant et l'autre pour supprimer le livre selectionner dans le popup 
+          /*fetch('http://localhost:5001/api/books/selectForDelete')
+            .then(reponse => {
+              if(!reponse.ok) {
+                throw new Error('Erreur lors de la recup des livres pour les supprimer');
+              }else{
+                const response = await fetch('http://localhost:5001/api/books', {
+                  method: 'DELETE',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({isbnDelete, nameDelete}), // Envoi des données sous forme de JSON
+                });
+              }
+              console.log('livre supprimé apres selection');
+              return reponse.json();
+            })
+            .then(data => {
+              if (data.length == 1){
+                  console.log('livre supprimé apres selection');
+              }
+            })
+            .catch(error =>{
+              console.error('erreur : ', error);
+            });*/
+
+
+brouillon bouton popup 
+        <Popup trigger={buttonPopup} setTrigger={setButtonPopup}> 
+          <h3> My popup </h3>
+        </Popup>
+
+          const [buttonPopup, setButtonPopup] = useState(false);
+
+        <button onClick={() => setButtonPopup(true)}>Oppen button</button>

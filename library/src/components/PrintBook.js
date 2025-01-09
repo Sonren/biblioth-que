@@ -30,7 +30,6 @@ function PrintBook({ onRefresh }) { // Nom du composant avec une majuscule
 
     return (
         <div>
-            <h2>Liste des livres</h2>
             <table>
                 <thead>
                     <tr>
